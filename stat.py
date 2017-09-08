@@ -86,3 +86,19 @@ df.coalesce(1).write.format('com.databricks.spark.csv').options(header='true').s
 stdOf1 = stdev.filter(lambda (x,y): y>1.0)
 
 stdev.filter(lambda (x,y): y>0.5).count()
+
+
+
+#ploting
+
+d = maximum_sold.map(lambda (a,b): a)
+flattern = lambda a: [item for sublist in a for item in sublist]
+
+def grp(pnos):
+    for pno in pnos:
+        a = df_acc.lookup(pno)
+        a = flattern(a)
+        pl.plot(list(range(len(a))),a)
+        pl.show()
+
+grp(d.take(10))

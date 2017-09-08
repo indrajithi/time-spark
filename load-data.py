@@ -251,6 +251,20 @@ t.max(key=lambda x: x[1])
 m = t.sortBy(lambda x: x[1], ascending=False)
 
 
+def toCSVLine(data):
+  return ','.join(str(d) for d in data)
+
+lines = labelsAndPredictions.map(toCSVLine)
+
+flattern = lambda a: [item for sublist in a for item in sublist]
+
+In [737]: def grp(pnos):
+     ...:     for pno in pnos:
+     ...:         a = df_acc.lookup(pno)
+     ...:         a = flattern(a)
+     ...:         pl.plot(list(range(len(a))),a)
+     ...:     pl.show()
+     ...:     
 
 
 

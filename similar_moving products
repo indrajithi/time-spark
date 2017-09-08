@@ -1,0 +1,40 @@
+# Lets say we have a product 1234 with levels [70,120,120,90,20,20,80] over the week. 
+
+If the percentage change is calculated as the movement of levels from 70 to 60 i.e., -14%. It doesn't give us any information about the changes that happened during the week.
+
+# If we calculate by aggregating the percentage change per day over the week.
+
+start   end   %change
+---------------------
+ 70  -  120 : +71%
+ 120 -	120 :   0%
+ 120 -   90 : -25%
+ 90  -   20 : -77%
+ 20  -   20 :   0%
+ 20  -   60 : +300%
+--------------------
+Average % increase		: +53%
+Average % decrease		: -15%
+Net % change in levels	:  +409%
+--------------------------------
+
+# If the level on Day1 was 0 and the Day2 was any other number, say 4. The percentage change is undefined (infinity). 
+So the relative percentage change is not an appropriate metric to find movement. 
+
+# I think the rate of change in SKU will give us better results here. 
+The rate of decrease of the above SKU is 15 units/day. The rate at which it is replenished is also 15 units/day with an average inventory level of 73 units/day.
+
+# The moving average is calculated based on the cost and the number of units. 
+It will not help us find the fast moving items. 
+
+# It is also possible to fit a polynomial function through this points. The derivative will give us the rate, but the above method makes more sense.
+
+# I have attached an image showing the levels of top 100 moving products. 
+Just by looking at the plot, we can say that some products increases in every 2 days, some on every 3 days and most on every 5 days.
+We can run a clustering algorithm to find similar moving products.
+
+
+It can also be used to predict the next levels. To do that we need to have features that will effect the levels. Historic whether data alone will at best give us a very less accurate model. We need more relevant features. 
+
+
+
