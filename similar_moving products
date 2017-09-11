@@ -1,8 +1,8 @@
 # Lets say we have a product 1234 with levels [70,120,120,90,20,20,80] over the week. 
 
-If the percentage change is calculated as the movement of levels from 70 to 60 i.e., -14%. It doesn't give us any information about the changes that happened during the week.
+If the percentage change is calculated as the movement of levels from 70 to 60 i.e., -14%. It won't give us any information about the changes that happened during the week.
 
-# If we calculate by aggregating the percentage change per day over the week.
+# If we calculate by aggregating the percentage change per day over the week we get a better estimate.
 
 start   end   %change
 ---------------------
@@ -15,26 +15,25 @@ start   end   %change
 --------------------
 Average % increase		: +53%
 Average % decrease		: -15%
-Net % change in levels	:  +409%
 --------------------------------
 
 # If the level on Day1 was 0 and the Day2 was any other number, say 4. The percentage change is undefined (infinity). 
-So the relative percentage change is not an appropriate metric to find movement. 
+So the relative percentage change is not the best metric to find movement. But can be used as a feature for predicting levels. 
 
-# I think the rate of change in SKU will give us better results here. 
-The rate of decrease of the above SKU is 15 units/day. The rate at which it is replenished is also 15 units/day with an average inventory level of 73 units/day.
-
-# The moving average is calculated based on the cost and the number of units. 
-It will not help us find the fast moving items. 
+# I think the rate of change in SKU is a better metric for movement. 
+The avg rate of decrease of the above SKU is 14 units/day. The avg rate at which it is replenished is 15 units/day with an average inventory level of 73 units/day. This can show how fast the product moves and how big its level is.
 
 # It is also possible to fit a polynomial function through this points. The derivative will give us the rate, but the above method makes more sense.
 
-# I have attached an image showing the levels of top 100 moving products. 
-Just by looking at the plot, we can say that some products increases in every 2 days, some on every 3 days and most on every 5 days.
+# I have attached an image showing the levels of top_100_moving_products over 30days period. (file: topMoving_100Sku.png) 
+Just by looking at the plot, we can say that some products increases in every 2 days, some on every 3 days and most on every 5 days. 
 We can run a clustering algorithm to find similar moving products.
 
+One more interesting thing is the when ever there is an increase in the levels most of the time there is a decrease at the same rate. This may be because they fill the inventory only after getting the request from the customer or knowing the demand.
 
-It can also be used to predict the next levels. To do that we need to have features that will effect the levels. Historic whether data alone will at best give us a very less accurate model. We need more relevant features. 
+The count of the hype (frequency) and its magnitude (level) can indicate the demand of that SKU. 
 
+# We can build a predictive model starting with these features:
+Cluster_group, Rate, Level, %change, frequency and each of their statistical features: ( stdev, mean, median etc,.) taken over the time window of a day, two days, a month, 3 months and historic whether data. 
 
-
+Please let me know if you think these findings are true. 

@@ -269,3 +269,18 @@ In [737]: def grp(pnos):
 
 
 
+In [60]: def avg(n):
+    ...:     pev = []
+    ...:     nev = []
+    ...:     
+    ...:     for i in range(len(n) -1):
+    ...:         c = change([n[i], n[i+1]])
+    ...:         if c > 0:
+    ...:             pev.append(c)
+    ...:         if c < 0:
+    ...:             nev.append(c)
+    ...:     print("pev:", pev, "avg:" ,sum(pev)/len(n) )
+    ...:     print("nev:", nev, "avg"  ,sum(nev)/len(n) )
+    ...:     
+    ...: 
+    ...:      
