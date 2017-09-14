@@ -351,3 +351,27 @@ In [382]: def Multyplot2(pnos):
 
 
 getavg = lambda a : [a[i] - a[i+1]  for i in range(len(a) -1)  ]
+
+
+
+In [677]: pd = df.rdd.map(lambda x: [x[0],[[x[1]] ,[x[2]]]])
+
+In [678]: pd1 = df1.rdd.map(lambda x: [x[0],[[x[1]] ,[x[2]]]])
+
+In [679]: pd2 = df2.rdd.map(lambda x: [x[0],[[x[1]] ,[x[2]]]])
+
+In [680]: tt = pd1.join(pd2)
+
+In [681]: tt.take(3)
+17/09/14 17:22:25 WARN TaskSetManager: Stage 10061 contains a task of very large size (633 KB). The maximum recommended task size is 100 KB.
+Out[681]:                                                                       
+[(u'GM1230358V',
+  ([[0], [u'8/17/2017 9:01:00 PM']], [[0], [u'8/18/2017 9:01:00 PM']])),
+ (u'GM2802106C',
+  ([[0], [u'8/17/2017 9:01:00 PM']], [[0], [u'8/18/2017 9:00:00 PM']])),
+ (u'VW1248135',
+  ([[5], [u'8/17/2017 9:01:00 PM']], [[5], [u'8/18/2017 9:01:00 PM']]))]
+
+
+
+  d = tt.map(lambda (x,(a,b)): (x,(a[0] + b[0], a[1] + b[1])))

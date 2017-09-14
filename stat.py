@@ -13,7 +13,7 @@ file_path   = os.path.join(".",file_dir)
 files       = glob.glob(file_path + "/*")
 files.sort()
 cwd = os.getcwd()
-filelds = ['PartNumber','QuantityAvailable']
+filelds = ['PartNumber','QuantityAvailable','DateCreated']
 
 
 def Sale(a):
@@ -45,14 +45,14 @@ def Analysis(a):
     return sale, repl, round(percentage_sale, 2)
 
 first_flag = True
-for file_no in range(len(files)):
+for file_no in range(0,7):
     
     #load csv in pandas and create dataframe
     f1 = pd.read_csv(files[ file_no ], sep="|", usecols=filelds)
     df = sqlContext.createDataFrame( f1 )
     
-    #create (key,value) pair as (part_number, quantity_available)
-    pair_df = df.rdd.map(lambda x: (x[0],[x[1]]))
+    #create (key,value) pair as (part_number, quantity_available, date_created)
+    pair_df = df.rdd.map(lambda x: [x[0],[ [x[1]] , [x[2]] ]])
 
     #execute after first iteration
     if first_flag == False:

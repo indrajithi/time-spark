@@ -1,3 +1,21 @@
+import numpy as np
+import pandas as pd
+import pylab as pl
+import csv
+import glob
+import os
+from pyspark.sql import SQLContext
+from pyspark.sql.types import *
+
+
+class Data:
+    """imports data to spark RDD"""
+    def __init__(self,datadir):
+
+
+
+
+
 class Frame:
     """Class for rate of change, ploting and other analysis
     Attributes: 
