@@ -8,7 +8,7 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import *
 import statistics as st
 
-file_dir    = "chicago"
+file_dir    = "dallas"
 file_path   = os.path.join(".",file_dir)
 files       = glob.glob(file_path + "/*")
 files.sort()
@@ -17,18 +17,24 @@ filelds = ['PartNumber','QuantityAvailable']
 
 
 def Sale(a):
-     sale = 0
-     for i in range(len(a) -1 ):
-         if a[i+1] < a[i]:
-             sale += a[i] - a[i + 1 ]
-     return sale
+    """
+    Finds the total units sold in the period
+    """
+    sale = 0
+    for i in range(len(a) -1 ):
+        if a[i+1] < a[i]:
+            sale += a[i] - a[i + 1 ]
+    return sale
 
 def Replenish(a):
-     repl = 0
-     for i in range(len(a) -1 ):
-         if a[i+1] > a[i]:
-             repl += a[i + 1] - a[i]
-     return repl
+    """
+    Finds the total units replinished in the period
+    """
+    repl = 0
+    for i in range(len(a) -1 ):
+        if a[i+1] > a[i]:
+            repl += a[i + 1] - a[i]
+    return repl
 
 def Analysis(a):
     sale , repl = Sale(a), Replenish(a)
@@ -39,7 +45,7 @@ def Analysis(a):
     return sale, repl, round(percentage_sale, 2)
 
 first_flag = True
-for file_no in range(7,14):
+for file_no in range(len(files)):
     
     #load csv in pandas and create dataframe
     f1 = pd.read_csv(files[ file_no ], sep="|", usecols=filelds)
@@ -83,15 +89,19 @@ df = sqlContext.createDataFrame(write, ['PartNumber', 'Sale','Replenish','Percen
 df.coalesce(1).write.format('com.databricks.spark.csv').options(header='true').save(cwd+'cv_out')
 
 #all the procucts that have standard deviation of 1
-stdOf1 = stdev.filter(lambda (x,y): y>1.0)
+stdOf1 = stdev.filter(lambda (x,y): y[0]>1.0)
 
 stdev.filter(lambda (x,y): y>0.5).count()
+
+#sale in range
+t = res.filter(lambda (x,y): y[0]>10 and y[0] <50)
 
 
 
 #ploting
 
 d = maximum_sold.map(lambda (a,b): a)
+#flattern the array [[a,b,c],[d]] to [a,b,c,d]
 flattern = lambda a: [item for sublist in a for item in sublist]
 
 def grp(pnos):
@@ -99,6 +109,18 @@ def grp(pnos):
         a = df_acc.lookup(pno)
         a = flattern(a)
         pl.plot(list(range(len(a))),a)
-        pl.show()
+    pl.show()
 
 grp(d.take(10))
+
+X = lambda a: np.arange(len(a))
+
+#savitzky_golay window smooting
+lk = lambda a: np.array(flattern(df_acc.lookup(a)))
+
+yhat = savitzky_golay(y, 21, 3) # window size 51, polynomial order 3
+
+plt.plot(x,y)
+plt.plot(x,yhat, color='red')
+plt.show()
+

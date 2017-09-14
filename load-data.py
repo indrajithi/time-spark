@@ -266,7 +266,7 @@ In [737]: def grp(pnos):
      ...:     pl.show()
      ...:     
 
-
+change = lambda a: (a[1] - a[0])*100/a[0]
 
 
 In [60]: def avg(n):
@@ -284,3 +284,70 @@ In [60]: def avg(n):
     ...:     
     ...: 
     ...:      
+
+  
+#polyfit
+         z = np.polyfit(x, y, 3)
+    ...: f = np.poly1d(z)
+    ...: 
+    ...: # calculate new x's and y's
+    ...: x_new = np.linspace(x[0], x[-1], 50)
+    ...: y_new = f(x_new)
+    ...: 
+    ...: plt.plot(x,y,'o', x_new, y_new)
+    ...: plt.xlim([x[0]-1, x[-1] + 1 ])
+    ...: plt.show()
+
+pltt = lambda a: plt.plot(list(range(len(y))), y)
+
+In [140]: yhat =savgol_filter(y,len(x),2)
+     ...: plt.plot(x,y)
+     ...: plt.plot(x,yhat, color='red')
+     ...: plt.show()
+
+
+#cubic plot
+def Multyplot(pnos):
+     ...:     count = 0
+     ...:     for pno in pnos:
+     ...:         y = lk(pno)
+     ...:         x = X(y)
+     ...:         yhat = savgol_filter(y, len(x)/2 -1 , 3)
+     ...:         
+     ...:         
+     ...:         if count % 4 == 0:
+     ...:             #plt.figure(count/4)
+     ...:             print count, count%4
+     ...:             fig, ax = plt.subplots(nrows=2,ncols=2)
+     ...:         plt.subplot(2,2, count %4 + 1 )
+     ...:         plt.plot(x,y)
+     ...:         plt.plot(x,yhat, color = 'red')
+     ...:         count +=1
+     ...:     pl.show()
+
+
+In [382]: def Multyplot2(pnos):
+     ...:     count = 0
+     ...:     for pno in pnos:
+     ...:         y = lk(pno)
+     ...:         x = X(y)
+     ...:         yhat = savgol_filter(y,7 , 3)
+     ...:         
+     ...:         
+     ...:         if len(pnos) >=4 and count % 4 == 0:
+     ...:             #plt.figure(count/4)
+     ...:             #print count, count%4
+     ...:             fig, ax = plt.subplots(nrows=2,ncols=2)
+     ...:         if len(pnos) >= 4:
+     ...:             plt.subplot(2,2, count %4 + 1 )
+     ...:         if len(pnos) == 2:
+     ...:             plt.subplot(2,1, count %2 + 1)
+     ...:         if len(pnos) == 3:
+     ...:             plt.subplot(2,2, count %4 + 1 )
+     ...:         plt.plot(x,y)
+     ...:         plt.plot(x,yhat, color = 'red')
+     ...:         count +=1
+     ...:     pl.show()
+
+
+getavg = lambda a : [a[i] - a[i+1]  for i in range(len(a) -1)  ]
