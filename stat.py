@@ -8,7 +8,7 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import *
 import statistics as st
 
-file_dir    = "dallas"
+file_dir    = "LKQ/aug/dallas"
 file_path   = os.path.join(".",file_dir)
 files       = glob.glob(file_path + "/*")
 files.sort()
@@ -113,10 +113,11 @@ def grp(pnos):
 
 grp(d.take(10))
 
+#generate x values depending on the length of Y
 X = lambda a: np.arange(len(a))
 
 #savitzky_golay window smooting
-lk = lambda a: np.array(flattern(df_acc.lookup(a)))
+look = lambda a: np.array(flattern(df_acc.lookup(a)))
 
 yhat = savitzky_golay(y, 21, 3) # window size 51, polynomial order 3
 
@@ -124,3 +125,30 @@ plt.plot(x,y)
 plt.plot(x,yhat, color='red')
 plt.show()
 
+
+class Analysis:
+    """Class for rate of change, ploting and other analysis
+    Attributes: 
+                values: list of inventory levels for the time period 
+    """
+    def __init__(self, pno):
+        self.pno = pno
+        self.values = self.look()
+
+    flattern = lambda self,a: [item for sublist in a for item in sublist]
+    generatex = lambda self,a: np.array(self.values)
+    
+    def look(self):
+        """returns list of levels for the time period """
+        return self.flattern( df_acc.lookup(self.pno) )
+
+    def rateofchange(self,window=5):
+        """Returns two array of the rate of change. (positive and negetive)"""
+    
+        y = self.values
+        x = self.generatex(y)
+        print(x)
+        print(y)
+    
+
+a = Analysis('TO1038115')
