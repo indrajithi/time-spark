@@ -8,9 +8,12 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import *
 
 
-class Data:
+def importdata(datadir)::
     """imports data to spark RDD"""
-    def __init__(self,datadir):
+    file_path   = os.path.join(".",file_dir)
+    files       = glob.glob(file_path + "/*")
+    files.sort()
+    
 
 
 
