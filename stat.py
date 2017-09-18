@@ -8,8 +8,11 @@ from pyspark.sql.types import *
 import statistics as st
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
+from scipy.signal import savgol_filter
+import matplotlib.lines as mlines
 
-file_dir    = "LKQ/aug/dallas"
+
+file_dir    = "../data/LKQ/aug/dallas"
 file_path   = os.path.join(".",file_dir)
 files       = glob.glob(file_path + "/*")
 files.sort()
@@ -37,7 +40,7 @@ def Replenish(a):
             repl += a[i + 1] - a[i]
     return repl
 
-def Analysis(a):
+def findsale(a):
     sale , repl = Sale(a), Replenish(a)
     if (a[0] + repl ) != 0:
         percentage_sale = (float(sale) / (a[0] + repl )) *100 
@@ -46,7 +49,7 @@ def Analysis(a):
     return sale, repl, round(percentage_sale, 2)
 
 first_flag = True
-for file_no in range(0,7):
+for file_no in range(len(files)):
     
     #load csv in pandas and create dataframe
     f1 = pd.read_csv(files[ file_no ], sep="|", usecols=filelds)
@@ -70,7 +73,7 @@ for file_no in range(0,7):
         first_flag = False
 
 
-res = df_acc.map(lambda (x, y): (x, Analysis(y[1]))) \
+res = df_acc.map(lambda (x, y): (x, findsale(y[1]))) \
 .map(lambda (x,(a,b,c)): (x,[a]+[b]+[c]))
 
 #res = df_acc.map(lambda (x, y): (x, round(st.stdev(y),2), Analysis(y))) \
@@ -155,36 +158,45 @@ class Analysis:
         nev = []
         pavg = navg = 0
         
-        print type(delta)
+        n = len(self.values[1])
 
-        for value in delta:
+        for i in range(n):
+            value = delta(i)
+
             if value > 0: 
                 pev.append(value)
             elif value < 0:
                 nev.append(value)
 
         if len(pev):
-            pavg = sum(pev)/len(pev)
+            pavg = sum(pev)/float(n)
         else:
             pavg = 0
 
         if len(nev):
-            navg = sum(nev)/len(nev)
+            navg = sum(nev)/float(n)
         else:
             navg = 0
 
         
         return pavg, navg
 
+    def avgrot(self,delta):
+        pev = []
+        nev = []
+        pavg = navg = 0
 
-    def rateofchange(self,window=7,order=3):
+        for i in range(len(self.values)):
+            value = delta(i)
+
+    def rateofchange(self,window=7,order=3,savgol_order=3):
         """Returns two array of the rate of change. (positive and negetive)"""
     
         y = np.array(self.values[1])
         x = self.generatex(len(y))
 
         #smooting
-        yhat = savgol_filter(y, window, 3) 
+        yhat = savgol_filter(y, window, savgol_order) 
 
         #polynomial fitting 
         z = np.polyfit(x, yhat, order)
@@ -224,13 +236,13 @@ class Analysis:
         order = mlines.Line2D(range(1), range(1), color="white",  \
             markerfacecolor="red",label='order: '+str(self.order))
         plt.grid(True)
-
+       
 
         
         try:
             level, = plt.plot(self.x, self.y, label="levels")
             savgol, = plt.plot(self.x, self.yhat, label="savgol_filter")
-            poly, = plt.plot(self.x, self.f(x), label="poly_fit")
+            poly, = plt.plot(self.x, self.f(self.x), label="poly_fit")
             plt.legend(handles=[level,savgol,poly,prate,nrate,window,order])
 
         except Exception as e:
@@ -243,3 +255,33 @@ a = Analysis('GM1900126PP')
 a.rateofchange()
 a.plot()
 plt.show()
+
+def Multyplot(pnos):
+    count = 0
+    for pno in pnos:
+        a = Analysis(pno)
+        a.rateofchange()
+
+        if len(pnos) >=4 and count % 4 == 0:
+            fig, ax = plt.subplots(nrows=2,ncols=2)
+        if len(pnos) >= 4:
+            plt.subplot(2,2, count %4 + 1 )
+        if len(pnos) == 2:
+            plt.subplot(2,1, count %2 + 1)
+        if len(pnos) == 3:
+            plt.subplot(2,2, count %4 + 1 )
+    
+        a.plot()
+        count +=1
+    plt.show()
+
+
+def mplot(pnos):
+    count = 0
+    for pno in pnos:
+        plt.figure(count)
+        count += 1
+        a = Analysis(pno)
+        a.rateofchange()
+        a.plot()
+    plt.show()    
