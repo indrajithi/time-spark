@@ -83,20 +83,6 @@ res = df_acc.map(lambda (x, y): (x, findsale(y[1]))) \
 #sorted by maximum sale
 maximum_sold = res.sortBy(lambda (x,y): y[0] , ascending=False)
 
-#write = maximum_sold.map(lambda (x,y): [x]+y)
-#filter products with atleast one sale and map from (k,(v1,v2,v3)) to [k,v1,v2,v3] 
-write = maximum_sold.filter(lambda (x,y): y[0]>=1).map(lambda (x,y): [x] +y)
-
-#Convert RDD to DataFrame
-df = sqlContext.createDataFrame(write, ['PartNumber', 'Sale','Replenish','PercentageSale'])
-
-#save dataframe as csv
-df.coalesce(1).write.format('com.databricks.spark.csv').options(header='true').save(cwd+'cv_out')
-
-#all the procucts that have standard deviation of 1
-stdOf1 = stdev.filter(lambda (x,y): y[0]>1.0)
-
-stdev.filter(lambda (x,y): y>0.5).count()
 
 #sale in range
 t = res.filter(lambda (x,y): y[0]>10 and y[0] <50)
@@ -124,11 +110,11 @@ X = lambda a: np.arange(len(a))
 #savitzky_golay window smooting
 look = lambda a: np.array(flattern(df_acc.lookup(a)))
 
-yhat = savitzky_golay(y, 21, 3) # window size 51, polynomial order 3
+#yhat = savitzky_golay(y, 21, 3) # window size 51, polynomial order 3
 
-plt.plot(x,y)
-plt.plot(x,yhat, color='red')
-plt.show()
+#plt.plot(x,y)
+#plt.plot(x,yhat, color='red')
+#plt.show()
 
 
 class Analysis:
@@ -220,9 +206,12 @@ class Analysis:
         return prate, nrate
 
     def plot(self):
-        plt.title("Pno: " + self.pno )
+        
         plt.ylabel("Inventory Level")
         plt.xlabel("Days")
+
+        pno = mlines.Line2D(range(1), range(1), color="white",  \
+            markerfacecolor="red",label='PNo: '+str(self.pno))
 
         prate = mlines.Line2D(range(1), range(1), color="white", marker="o", \
             markerfacecolor="green",label='+ve rate: '+str(round(self.prate,2)))
@@ -243,7 +232,7 @@ class Analysis:
             level, = plt.plot(self.x, self.y, label="levels")
             savgol, = plt.plot(self.x, self.yhat, label="savgol_filter")
             poly, = plt.plot(self.x, self.f(self.x), label="poly_fit")
-            plt.legend(handles=[level,savgol,poly,prate,nrate,window,order])
+            plt.legend(handles=[pno,level,savgol,poly,prate,nrate,window,order])
 
         except Exception as e:
             print "ERROR: rateofchange() should be called before plot"
@@ -285,3 +274,19 @@ def mplot(pnos):
         a.rateofchange()
         a.plot()
     plt.show()    
+
+
+#write = maximum_sold.map(lambda (x,y): [x]+y)
+#filter products with atleast one sale and map from (k,(v1,v2,v3)) to [k,v1,v2,v3] 
+write = maximum_sold.filter(lambda (x,y): y[0]>=1).map(lambda (x,y): [x] +y)
+
+#Convert RDD to DataFrame
+df = sqlContext.createDataFrame(write, ['PartNumber', 'Sale','Replenish','PercentageSale'])
+
+#save dataframe as csv
+df.coalesce(1).write.format('com.databricks.spark.csv').options(header='true').save(cwd+'cv_out')
+
+#all the procucts that have standard deviation of 1
+stdOf1 = stdev.filter(lambda (x,y): y[0]>1.0)
+
+stdev.filter(lambda (x,y): y>0.5).count()
