@@ -1,4 +1,4 @@
-# spark_data_analysis
+# Time-Spark
 
 A small python package for time series analysis on Spark. 
 ![rate-of-change-plot](plt.png)
