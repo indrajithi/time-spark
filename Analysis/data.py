@@ -8,14 +8,14 @@ from pyspark.sql import SQLContext
 from pyspark.sql.types import *
 from pyspark.sql.types import sqlContext
 
-def importdata(datadir):
+def importdata(datadir, filelds = ['PartNumber','QuantityAvailable','DateCreated','CustomerPrice']):
     """imports data to spark RDD"""
     file_path   = os.path.join(".",datadir)
     files       = glob.glob(file_path + "/*")
     files.sort()
 
     cwd = os.getcwd()
-    filelds = ['PartNumber','QuantityAvailable','DateCreated','CustomerPrice']
+    
 
 
     def Sale(a):
