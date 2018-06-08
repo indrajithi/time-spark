@@ -31,5 +31,3 @@ Data is stored as `Key, Value` pair
     ]
 
 ```
-
-## Note: This project is in development stage.  
